@@ -1,69 +1,61 @@
 import socket
-from PIL import Image
-import RSA
-import versi1
-import random
-from math import pow
+import threading
 
-server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # AF_INET = IP, SOCK_STREAM = TCP
-server.bind(('localhost', 1002))  # 127.0.0.1
+# Connection Data
+host = '10.8.131.7'
+port = 55555
+
+# Starting Server
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.bind((host, port))
 server.listen()
 
-client_socket, client_address = server.accept()
+# Lists For Clients and Their Nicknames
+clients = []
+nicknames = []
 
-option = client_socket.recv(2048).decode('ascii')
-if option.lower() == "image":
-    print("Receiving encrypted image...")
-    encrypted_string = client_socket.recv(16384000).decode('ascii')
-    
-    imagename = input("Decrypting image...\nInput image name: ")
-    pixels_test = RSA.dec(encrypted_string[:-10])
-    # print(pixels_test)
-    image_test = Image.new('RGBA',(int(encrypted_string[-10:-5]), int(encrypted_string[-5:])))
-    image_test.putdata(pixels_test)
-    image_test.save('{}.png'.format(imagename))
-    
-    print("Image Received.")
+# Sending Messages To All Connected Clients
+def broadcast(message):
+  for client in clients:
+    client.send(message)
 
-elif option.lower() == "text":
-    print("Receiving text...")
-    message = client_socket.recv(2048).decode('ascii')
-    message2 = client_socket.recv(2048).decode('ascii')
-    message3 = client_socket.recv(2048).decode('ascii')
-    message4 = client_socket.recv(2048).decode('ascii')
-    print("encrypted message: ", end="")
-    print(message)
-    print(type(message))
-    print("encrypted p: ", end="")
-    print(message2)
-    ct = message
-    ct = ct.split()
-    print("ct split: ", end="")
-    print(ct)
-    print(type(ct))
-    p = message2
-    p = int(message2)
-    print("p int: ", end="")
-    print(p)
-    print(type(p))
+# Handling Messages From Clients
+def handle(client):
+  while True:
+    try:
+      # Broadcasting Messages
+      message = client.recv(1024)
+      broadcast(message)
+    except:
+      # Removing And Closing Clients
+      index = clients.index(client)
+      clients.remove(client)
+      client.close()
+      nickname = nicknames[index]
+      broadcast('{} left!'.format(nickname).encode('ascii'))
+      nicknames.remove(nickname)
+      break
 
-    key = message3
-    key = int(message3)
-    print("key: ", end="")
-    print(key)
-    print(type(key))
+# Receiving / Listening Function
+def receive():
+  while True:
+    # Accept Connection
+    client, address = server.accept()
+    print("Connected with {}".format(str(address)))
 
-    q = message4
-    q = int(message4)
-    print("q: ", end="")
-    print(q)
-    print(type(q))
+    # Request And Store Nickname
+    client.send('NICK'.encode('ascii'))
+    nickname = client.recv(1024).decode('ascii')
+    nicknames.append(nickname)
+    clients.append(client)
 
-    # q=random.randint(pow(10,20),pow(10,50))
-    # key=versi1.gen_key(q)
-    pt=versi1.decryption(ct,p,key,q)
-    d_msg=''.join(pt)
-    print("decrypted message: ", end="")
-    print(d_msg)
+    # Print And Broadcast Nickname
+    print("Nickname is {}".format(nickname))
+    broadcast("{} joined! ".format(nickname).encode('ascii'))
+    client.send('Connected to server!'.encode('ascii'))
 
-client_socket.close()
+    # Start Handling Thread For Client
+    thread = threading.Thread(target=handle, args=(client,))
+    thread.start()
+
+receive()
