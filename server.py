@@ -2,7 +2,7 @@ import socket
 import threading
 
 # Connection Data
-host = '10.8.131.7'
+host = '10.8.131.34'
 port = 55555
 
 # Starting Server
@@ -24,7 +24,7 @@ def handle(client):
   while True:
     try:
       # Broadcasting Messages
-      message = client.recv(1024)
+      message = client.recv(4096)
       broadcast(message)
     except:
       # Removing And Closing Clients
@@ -45,7 +45,7 @@ def receive():
 
     # Request And Store Nickname
     client.send('NICK'.encode('ascii'))
-    nickname = client.recv(1024).decode('ascii')
+    nickname = client.recv(4096).decode('ascii')
     nicknames.append(nickname)
     clients.append(client)
 
