@@ -29,8 +29,11 @@ elif option.lower() == "text":
     print("Receiving text...")
     message = client_socket.recv(2048).decode('ascii')
     message2 = client_socket.recv(2048).decode('ascii')
+    message3 = client_socket.recv(2048).decode('ascii')
+    message4 = client_socket.recv(2048).decode('ascii')
     print("encrypted message: ", end="")
     print(message)
+    print(type(message))
     print("encrypted p: ", end="")
     print(message2)
     ct = message
@@ -44,8 +47,20 @@ elif option.lower() == "text":
     print(p)
     print(type(p))
 
-    q=random.randint(pow(10,20),pow(10,50))
-    key=versi1.gen_key(q)
+    key = message3
+    key = int(message3)
+    print("key: ", end="")
+    print(key)
+    print(type(key))
+
+    q = message4
+    q = int(message4)
+    print("q: ", end="")
+    print(q)
+    print(type(q))
+
+    # q=random.randint(pow(10,20),pow(10,50))
+    # key=versi1.gen_key(q)
     pt=versi1.decryption(ct,p,key,q)
     d_msg=''.join(pt)
     print("decrypted message: ", end="")

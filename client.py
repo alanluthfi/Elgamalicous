@@ -95,13 +95,27 @@ elif option.lower() == "text":
 
     p = str(p)
     p = p.encode("ascii")
+
+    key = str(key)
+    key = key.encode("ascii")
+
+    q = str(q)
+    q = q.encode("ascii")
+
+
     print("CT = ",ct)
     print(type(ct))
     print("P = ",p)
     print(type(p))
+    print("key = ",key)
+    print(type(key))
+    print("Q = ",q)
+    print(type(q))
 
     client.send(ct)
     client.send(p)
+    client.send(key)
+    client.send(q)
     #client.send(encrypted.encode("ascii"))
     print("Message sent.")
 
