@@ -3,7 +3,7 @@ from random import randrange as rr
 # p dan g disepakati (static)
 p = 2273  # bilangan prima (public)
 
-# g merupakan akar primitif dari n (public)
+# g merupakan akar primitif dari p (public)
 g = 0
 for _ in range(1, p):
   g1 = [_**i % p for i in range(1, p)]

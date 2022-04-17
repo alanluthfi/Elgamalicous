@@ -10,7 +10,7 @@ nickname = input("Choose your nickname: ")
 
 # Connecting To Server
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-host = '10.8.131.6'
+host = '10.8.131.5'
 client.connect((host, 55555))
 
 x = rr(2, p - 1)
@@ -49,7 +49,7 @@ def write():
   first = True
   while True:
     if first:
-      input("sending X. Press enter...\n")
+      input("sending pub key. Press enter...\n")
       message = '{}'.format(public_key(x))
       first = False
     else:
